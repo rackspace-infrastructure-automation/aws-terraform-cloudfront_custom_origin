@@ -21,7 +21,7 @@ module "cloudfront_custom_origin" {
   https_port             = 443
   origin_protocol_policy = "https-only"
 
-  aliases = ["testdomain.testing.example.com"]
+  aliases = ["testdomain.${random_string.cloudfront_rstring.result}.example.com"]
 
   # default cache behavior
   allowed_methods  = ["GET", "HEAD"]
