@@ -9,7 +9,7 @@ resource "random_string" "cloudfront_rstring" {
 }
 
 module "cloudfront_custom_origin" {
-  source              = "/path/to/module"
+  source              = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudfront_custom_origin//?ref=v0.0.3"
   domain_name         = "customdomain.testing.example.com"
   origin_id           = "${random_string.cloudfront_rstring.result}"
   enabled             = true
