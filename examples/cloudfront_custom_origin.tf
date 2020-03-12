@@ -9,7 +9,7 @@ resource "random_string" "cloudfront_rstring" {
 }
 
 module "cloudfront_custom_origin" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudfront_custom_origin//?ref=v0.0.3"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudfront_custom_origin//?ref=v0.0.4"
 
   aliases                        = ["testdomain.testing.example.com"]
   allowed_methods                = ["GET", "HEAD"]

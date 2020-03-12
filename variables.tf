@@ -83,7 +83,7 @@ variable "enabled" {
 }
 
 variable "environment" {
-  description = "Application environment for which this is being created. one of: ('Development', 'Integration', 'PreProduction', 'Production', 'QA', 'Staging', 'Test')"
+  description = "A field used to set the Environment tag on created resources"
   type        = "string"
   default     = "Development"
 }
