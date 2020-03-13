@@ -1,6 +1,11 @@
+
+terraform {
+  required_version = ">= 0.12"
+}
+
 provider "aws" {
   region  = "us-west-2"
-  version = "~> 2.2"
+  version = "~> 2.7"
 }
 
 resource "random_string" "cloudfront_rstring" {
@@ -24,12 +29,13 @@ module "cloudfront_custom_origin" {
   forward                        = "none"
   https_port                     = 443
   locations                      = ["US", "CA", "GB", "DE"]
-  origin_id                      = "${random_string.cloudfront_rstring.result}"
+  origin_id                      = random_string.cloudfront_rstring.result
   origin_protocol_policy         = "https-only"
   path_pattern                   = "*"
   price_class                    = "PriceClass_200"
   query_string                   = false
   restriction_type               = "whitelist"
-  target_origin_id               = "${random_string.cloudfront_rstring.result}"
+  target_origin_id               = random_string.cloudfront_rstring.result
   viewer_protocol_policy         = "redirect-to-https"
 }
+

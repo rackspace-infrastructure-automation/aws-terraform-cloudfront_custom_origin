@@ -38,49 +38,71 @@
  * Full working references are available at [examples](examples)
  */
 
+ terraform {
+  required_version = ">= 0.12"
+
+  required_providers {
+    aws = ">= 2.7.0"
+  }
+}
+
+
 locals {
-  bucket_logging_config = "${var.bucket_logging ? "enabled" : "disabled"}"
+  bucket_logging_config = var.bucket_logging ? "enabled" : "disabled"
 
   tags = {
-    Name            = "${var.origin_id}"
+    Name            = var.origin_id
     ServiceProvider = "Rackspace"
-    Environment     = "${var.environment}"
+    Environment     = var.environment
   }
 
   bucket_logging = {
-    enabled = [{
-      bucket          = "${var.bucket}"
-      include_cookies = "${var.include_cookies}"
-      prefix          = "${var.prefix}"
-    }]
-
-    disabled = "${list()}"
+    enabled = [
+      {
+        bucket          = var.bucket
+        include_cookies = var.include_cookies
+        prefix          = var.prefix
+      },
+    ]
+    disabled = []
   }
 }
 
 resource "aws_cloudfront_distribution" "cf_distribution" {
-  aliases             = ["${var.aliases}"]
-  comment             = "${var.comment}"
-  default_root_object = "${var.default_root_object}"
-  enabled             = "${var.enabled}"
-  http_version        = "${var.http_version}"
-  is_ipv6_enabled     = "${var.is_ipv6_enabled}"
-  logging_config      = ["${local.bucket_logging[local.bucket_logging_config]}"]
-  price_class         = "${var.price_class}"
-  tags                = "${merge(var.tags, local.tags)}"
-  web_acl_id          = "${var.web_acl_id}"
+  aliases             = var.aliases
+  comment             = var.comment
+  default_root_object = var.default_root_object
+  enabled             = var.enabled
+  http_version        = var.http_version
+  is_ipv6_enabled     = var.is_ipv6_enabled
+  dynamic "logging_config" {
+    for_each = [local.bucket_logging[local.bucket_logging_config]]
+    content {
+      # TF-UPGRADE-TODO: The automatic upgrade tool can't predict
+      # which keys might be set in maps assigned here, so it has
+      # produced a comprehensive set here. Consider simplifying
+      # this after confirming which keys can be set in practice.
+
+      bucket          = logging_config.value.bucket
+      include_cookies = lookup(logging_config.value, "include_cookies", null)
+      prefix          = lookup(logging_config.value, "prefix", null)
+    }
+  }
+  price_class = var.price_class
+  tags        = merge(var.tags, local.tags)
+  web_acl_id  = var.web_acl_id
 
   default_cache_behavior {
-    allowed_methods        = "${var.allowed_methods}"
-    cached_methods         = "${var.cached_methods}"
-    compress               = "${var.compress}"
-    default_ttl            = "${var.default_ttl}"
-    max_ttl                = "${var.max_ttl}"
-    min_ttl                = "${var.min_ttl}"
-    smooth_streaming       = "${var.smooth_streaming}"
-    target_origin_id       = "${var.target_origin_id}"
-    trusted_signers        = "${var.trusted_signers}"
-    viewer_protocol_policy = "${var.viewer_protocol_policy}"
+    allowed_methods        = var.allowed_methods
+    cached_methods         = var.cached_methods
+    compress               = var.compress
+    default_ttl            = var.default_ttl
+    max_ttl                = var.max_ttl
+    min_ttl                = var.min_ttl
+    smooth_streaming       = var.smooth_streaming
+    target_origin_id       = var.target_origin_id
+    trusted_signers        = var.trusted_signers
+    viewer_protocol_policy = var.viewer_protocol_policy
 
     # Removing this property due to issues dynamically providing these values.  Will be reenabled
     # after release of terraform v0.12 and support for dynamic config blocks.
@@ -88,45 +110,57 @@ resource "aws_cloudfront_distribution" "cf_distribution" {
     # lambda_function_association = "${var.lambdas}"
 
     forwarded_values {
-      headers                 = "${var.headers}"
-      query_string            = "${var.query_string}"
-      query_string_cache_keys = "${var.query_string_cache_keys}"
+      headers                 = var.headers
+      query_string            = var.query_string
+      query_string_cache_keys = var.query_string_cache_keys
 
       cookies {
-        forward           = "${var.forward}"
-        whitelisted_names = "${var.whitelisted_names}"
+        forward           = var.forward
+        whitelisted_names = var.whitelisted_names
       }
     }
   }
 
   origin {
-    custom_header = "${var.custom_header}"
-    domain_name   = "${var.domain_name}"
-    origin_id     = "${var.origin_id}"
-    origin_path   = "${var.origin_path}"
+    dynamic "custom_header" {
+      for_each = var.custom_header
+      content {
+        # TF-UPGRADE-TODO: The automatic upgrade tool can't predict
+        # which keys might be set in maps assigned here, so it has
+        # produced a comprehensive set here. Consider simplifying
+        # this after confirming which keys can be set in practice.
 
-    custom_origin_config = {
-      http_port                = "${var.http_port}"
-      https_port               = "${var.https_port}"
-      origin_keepalive_timeout = "${var.origin_keepalive_timeout}"
-      origin_protocol_policy   = "${var.origin_protocol_policy}"
-      origin_read_timeout      = "${var.origin_read_timeout}"
-      origin_ssl_protocols     = "${var.origin_ssl_protocols}"
+        name  = custom_header.value.name
+        value = custom_header.value.value
+      }
+    }
+    domain_name = var.domain_name
+    origin_id   = var.origin_id
+    origin_path = var.origin_path
+
+    custom_origin_config {
+      http_port                = var.http_port
+      https_port               = var.https_port
+      origin_keepalive_timeout = var.origin_keepalive_timeout
+      origin_protocol_policy   = var.origin_protocol_policy
+      origin_read_timeout      = var.origin_read_timeout
+      origin_ssl_protocols     = var.origin_ssl_protocols
     }
   }
 
   restrictions {
     geo_restriction {
-      locations        = "${var.locations}"
-      restriction_type = "${var.restriction_type}"
+      locations        = var.locations
+      restriction_type = var.restriction_type
     }
   }
 
   viewer_certificate {
-    acm_certificate_arn            = "${var.acm_certificate_arn}"
-    cloudfront_default_certificate = "${var.cloudfront_default_certificate}"
-    iam_certificate_id             = "${var.iam_certificate_id}"
-    minimum_protocol_version       = "${var.minimum_protocol_version}"
-    ssl_support_method             = "${var.ssl_support_method}"
+    acm_certificate_arn            = var.acm_certificate_arn
+    cloudfront_default_certificate = var.cloudfront_default_certificate
+    iam_certificate_id             = var.iam_certificate_id
+    minimum_protocol_version       = var.minimum_protocol_version
+    ssl_support_method             = var.ssl_support_method
   }
 }
+
