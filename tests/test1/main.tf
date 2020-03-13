@@ -1,48 +1,35 @@
 provider "aws" {
-  version = "~> 2.2"
   region  = "us-west-2"
+  version = "~> 2.2"
 }
 
 resource "random_string" "cloudfront_rstring" {
   length  = 18
-  upper   = false
   special = false
+  upper   = false
 }
 
 module "cloudfront_custom_origin" {
-  source              = "../../module"
-  domain_name         = "customdomain.testing.example.com"
-  origin_id           = "${random_string.cloudfront_rstring.result}"
-  enabled             = true
-  comment             = "This is a test comment"
-  default_root_object = "index.html"
-  bucket_logging      = false
+  source = "../../module"
 
-  # Custom Origin
-  https_port             = 443
-  origin_protocol_policy = "https-only"
-
-  # default cache behavior
-  allowed_methods  = ["GET", "HEAD"]
-  cached_methods   = ["GET", "HEAD"]
-  path_pattern     = "*"
-  target_origin_id = "${random_string.cloudfront_rstring.result}"
-
-  # Forwarded Values
-  query_string = false
-
-  #Cookies
-  forward = "none"
-
-  viewer_protocol_policy = "redirect-to-https"
-  default_ttl            = "3600"
-
-  price_class = "PriceClass_200"
-
-  # restrictions
-  restriction_type = "whitelist"
-  locations        = ["US", "CA", "GB", "DE"]
-
-  # Certificate
+  allowed_methods                = ["GET", "HEAD"]
+  bucket_logging                 = false
+  cached_methods                 = ["GET", "HEAD"]
   cloudfront_default_certificate = true
+  comment                        = "This is a test comment"
+  default_root_object            = "index.html"
+  default_ttl                    = "3600"
+  domain_name                    = "customdomain.testing.example.com"
+  enabled                        = true
+  forward                        = "none"
+  https_port                     = 443
+  locations                      = ["US", "CA", "GB", "DE"]
+  origin_id                      = "${random_string.cloudfront_rstring.result}"
+  origin_protocol_policy         = "https-only"
+  path_pattern                   = "*"
+  price_class                    = "PriceClass_200"
+  query_string                   = false
+  restriction_type               = "whitelist"
+  target_origin_id               = "${random_string.cloudfront_rstring.result}"
+  viewer_protocol_policy         = "redirect-to-https"
 }

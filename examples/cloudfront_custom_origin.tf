@@ -4,54 +4,34 @@ provider "aws" {
 
 resource "random_string" "cloudfront_rstring" {
   length  = 18
-  upper   = false
   special = false
+  upper   = false
 }
 
 module "cloudfront_custom_origin" {
-  source              = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudfront_custom_origin//?ref=v0.0.3"
-  domain_name         = "customdomain.testing.example.com"
-  origin_id           = "${random_string.cloudfront_rstring.result}"
-  enabled             = true
-  comment             = "This is a test comment"
-  default_root_object = "index.html"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudfront_custom_origin//?ref=v0.0.4"
 
-  # logging config 
-  # Bucket must already exist, can't be generated as a resource along with example.
-  # This is a TF bug.
-  # The bucket name must be the full bucket ie bucket.s3.amazonaws.com
-  bucket = "mybucket.s3.amazonaws.com"
-
-  prefix         = "myprefix"
-  bucket_logging = true
-
-  # Custom Origin
-  https_port             = 443
-  origin_protocol_policy = "https-only"
-
-  aliases = ["testdomain.testing.example.com"]
-
-  # default cache behavior
-  allowed_methods  = ["GET", "HEAD"]
-  cached_methods   = ["GET", "HEAD"]
-  path_pattern     = "*"
-  target_origin_id = "${random_string.cloudfront_rstring.result}"
-
-  # Forwarded Values
-  query_string = false
-
-  #Cookies
-  forward = "none"
-
-  viewer_protocol_policy = "redirect-to-https"
-  default_ttl            = "3600"
-
-  price_class = "PriceClass_200"
-
-  # restrictions
-  restriction_type = "whitelist"
-  locations        = ["US", "CA", "GB", "DE"]
-
-  # Certificate
+  aliases                        = ["testdomain.testing.example.com"]
+  allowed_methods                = ["GET", "HEAD"]
+  bucket                         = "mybucket.s3.amazonaws.com"
+  bucket_logging                 = true
+  cached_methods                 = ["GET", "HEAD"]
   cloudfront_default_certificate = true
+  comment                        = "This is a test comment"
+  default_root_object            = "index.html"
+  default_ttl                    = "3600"
+  domain_name                    = "customdomain.testing.example.com"
+  enabled                        = true
+  forward                        = "none"
+  https_port                     = 443
+  locations                      = ["US", "CA", "GB", "DE"]
+  origin_id                      = "${random_string.cloudfront_rstring.result}"
+  origin_protocol_policy         = "https-only"
+  path_pattern                   = "*"
+  prefix                         = "myprefix"
+  price_class                    = "PriceClass_200"
+  query_string                   = false
+  restriction_type               = "whitelist"
+  target_origin_id               = "${random_string.cloudfront_rstring.result}"
+  viewer_protocol_policy         = "redirect-to-https"
 }
