@@ -7,7 +7,7 @@
  *
  * ```
  * module "cloudfront_custom_origin" {
- *   source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudfront_custom_origin//?ref=v0.0.4"
+ *   source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudfront_custom_origin//?ref=v0.12.0"
  *
  *   aliases                        = ["testdomain.testing.example.com"]
  *   allowed_methods                = ["GET", "HEAD"]
@@ -36,9 +36,16 @@
  * ```
  *
  * Full working references are available at [examples](examples)
+ *
+ * ## Terraform 0.12 upgrade
+ *
+ * Several changes were made while adding terraform 0.12 compatibility.
+ * The main change to be aware of is the `customer_header` variable
+ * changed types from `list(string)` to `list(map(string))` to properly function with dynamic
+ * configuration blocks.
  */
 
- terraform {
+terraform {
   required_version = ">= 0.12"
 
   required_providers {
@@ -48,7 +55,6 @@
 
 
 locals {
-  bucket_logging_config = var.bucket_logging ? "enabled" : "disabled"
 
   tags = {
     Name            = var.origin_id
@@ -57,14 +63,10 @@ locals {
   }
 
   bucket_logging = {
-    enabled = [
-      {
-        bucket          = var.bucket
-        include_cookies = var.include_cookies
-        prefix          = var.prefix
-      },
-    ]
-    disabled = []
+    bucket          = var.bucket
+    include_cookies = var.include_cookies
+    prefix          = var.prefix
+
   }
 }
 
@@ -76,13 +78,8 @@ resource "aws_cloudfront_distribution" "cf_distribution" {
   http_version        = var.http_version
   is_ipv6_enabled     = var.is_ipv6_enabled
   dynamic "logging_config" {
-    for_each = [local.bucket_logging[local.bucket_logging_config]]
+    for_each = var.bucket_logging ? [local.bucket_logging] : []
     content {
-      # TF-UPGRADE-TODO: The automatic upgrade tool can't predict
-      # which keys might be set in maps assigned here, so it has
-      # produced a comprehensive set here. Consider simplifying
-      # this after confirming which keys can be set in practice.
-
       bucket          = logging_config.value.bucket
       include_cookies = lookup(logging_config.value, "include_cookies", null)
       prefix          = lookup(logging_config.value, "prefix", null)
@@ -125,11 +122,6 @@ resource "aws_cloudfront_distribution" "cf_distribution" {
     dynamic "custom_header" {
       for_each = var.custom_header
       content {
-        # TF-UPGRADE-TODO: The automatic upgrade tool can't predict
-        # which keys might be set in maps assigned here, so it has
-        # produced a comprehensive set here. Consider simplifying
-        # this after confirming which keys can be set in practice.
-
         name  = custom_header.value.name
         value = custom_header.value.value
       }

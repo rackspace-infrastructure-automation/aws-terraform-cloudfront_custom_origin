@@ -18,6 +18,7 @@ module "cloudfront_custom_origin" {
   source = "../../module"
 
   allowed_methods                = ["GET", "HEAD"]
+  custom_header                  = [{ name = "header1", value = "value1" }, { name = "header2", value = "value2" }]
   bucket_logging                 = false
   cached_methods                 = ["GET", "HEAD"]
   cloudfront_default_certificate = true

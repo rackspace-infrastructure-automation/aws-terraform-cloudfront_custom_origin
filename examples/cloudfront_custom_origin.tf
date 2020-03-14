@@ -1,5 +1,11 @@
+
+terraform {
+  required_version = ">= 0.12"
+}
+
 provider "aws" {
-  region = "us-west-2"
+  version = "~> 2.7"
+  region  = "us-west-2"
 }
 
 resource "random_string" "cloudfront_rstring" {
@@ -9,7 +15,7 @@ resource "random_string" "cloudfront_rstring" {
 }
 
 module "cloudfront_custom_origin" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudfront_custom_origin//?ref=v0.0.4"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudfront_custom_origin//?ref=v0.12.0"
 
   aliases                        = ["testdomain.testing.example.com"]
   allowed_methods                = ["GET", "HEAD"]
@@ -23,15 +29,16 @@ module "cloudfront_custom_origin" {
   domain_name                    = "customdomain.testing.example.com"
   enabled                        = true
   forward                        = "none"
-  https_port                     = 443
+  https_port                     = "443"
   locations                      = ["US", "CA", "GB", "DE"]
-  origin_id                      = "${random_string.cloudfront_rstring.result}"
+  origin_id                      = random_string.cloudfront_rstring.result
   origin_protocol_policy         = "https-only"
   path_pattern                   = "*"
   prefix                         = "myprefix"
   price_class                    = "PriceClass_200"
   query_string                   = false
   restriction_type               = "whitelist"
-  target_origin_id               = "${random_string.cloudfront_rstring.result}"
+  target_origin_id               = random_string.cloudfront_rstring.result
   viewer_protocol_policy         = "redirect-to-https"
 }
+

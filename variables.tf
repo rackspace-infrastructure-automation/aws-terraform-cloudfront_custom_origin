@@ -24,7 +24,7 @@ variable "bucket" {
 
 variable "bucket_logging" {
   description = "Enable logging to an S3 Bucket. If this is set you must configure below."
-  type        = string
+  type        = bool
   default     = false
 }
 
@@ -48,13 +48,13 @@ variable "comment" {
 
 variable "compress" {
   description = "Indicates whether CloudFront automatically compresses certain files for this cache behavior. (OPTIONAL)"
-  type        = string
+  type        = bool
   default     = false
 }
 
 variable "custom_header" {
-  description = "One or more sub-resources with name and value parameters that specify header data that will be sent to the origin"
-  type        = list(string)
+  description = "One or more sub-resources with name and value parameters that specify header data that will be sent to the origin. For example: `[{name = \"header1\", value = \"value1\"}]`."
+  type        = list(map(string))
   default     = []
 }
 
@@ -78,7 +78,7 @@ variable "domain_name" {
 
 variable "enabled" {
   description = "Whether the distribution is enabled to accept end user requests for content."
-  type        = string
+  type        = bool
   default     = true
 }
 
@@ -126,13 +126,13 @@ variable "iam_certificate_id" {
 
 variable "include_cookies" {
   description = "Indicates whether CloudFront includes cookies in access logs."
-  type        = string
+  type        = bool
   default     = false
 }
 
 variable "is_ipv6_enabled" {
   description = "Whether the IPv6 is enabled for the distribution. (OPTIONAL)"
-  type        = string
+  type        = bool
   default     = false
 }
 
@@ -235,7 +235,7 @@ variable "price_class" {
 
 variable "query_string" {
   description = "Indicates whether you want CloudFront to forward query strings to the origin that is associated with this cache behavior."
-  type        = string
+  type        = bool
   default     = false
 }
 
@@ -253,7 +253,7 @@ variable "restriction_type" {
 
 variable "smooth_streaming" {
   description = "Indicates whether you want to distribute media files in Microsoft Smooth Streaming format using the origin that is associated with this cache behavior. (OPTIONAL)"
-  type        = string
+  type        = bool
   default     = false
 }
 
