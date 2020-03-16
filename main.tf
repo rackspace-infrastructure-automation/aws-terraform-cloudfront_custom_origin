@@ -77,6 +77,10 @@ resource "aws_cloudfront_distribution" "cf_distribution" {
   enabled             = var.enabled
   http_version        = var.http_version
   is_ipv6_enabled     = var.is_ipv6_enabled
+  price_class         = var.price_class
+  tags                = merge(var.tags, local.tags)
+  web_acl_id          = var.web_acl_id
+
   dynamic "logging_config" {
     for_each = var.bucket_logging ? [local.bucket_logging] : []
     content {
@@ -85,9 +89,6 @@ resource "aws_cloudfront_distribution" "cf_distribution" {
       prefix          = lookup(logging_config.value, "prefix", null)
     }
   }
-  price_class = var.price_class
-  tags        = merge(var.tags, local.tags)
-  web_acl_id  = var.web_acl_id
 
   default_cache_behavior {
     allowed_methods        = var.allowed_methods
@@ -119,6 +120,10 @@ resource "aws_cloudfront_distribution" "cf_distribution" {
   }
 
   origin {
+    domain_name = var.domain_name
+    origin_id   = var.origin_id
+    origin_path = var.origin_path
+
     dynamic "custom_header" {
       for_each = var.custom_header
       content {
@@ -126,9 +131,6 @@ resource "aws_cloudfront_distribution" "cf_distribution" {
         value = custom_header.value.value
       }
     }
-    domain_name = var.domain_name
-    origin_id   = var.origin_id
-    origin_path = var.origin_path
 
     custom_origin_config {
       http_port                = var.http_port
