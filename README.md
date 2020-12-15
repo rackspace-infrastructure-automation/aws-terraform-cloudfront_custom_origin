@@ -47,7 +47,7 @@ configuration blocks.
 
 | Name | Version |
 |------|---------|
-| aws | >= 2.7.0 |
+| aws | >= 3.0.0 |
 
 ## Inputs
 
@@ -98,7 +98,7 @@ configuration blocks.
 | ssl\_support\_method | Specifies how you want CloudFront to serve HTTPS requests. One of vip or sni-only. Required if you specify acm\_certificate\_arn or iam\_certificate\_id. NOTE: vip causes CloudFront to use a dedicated IP address and may incur extra charges. | `string` | `"sni-only"` | no |
 | tags | Custom tags to apply to all resources. | `map(string)` | `{}` | no |
 | target\_origin\_id | The ID value of the origin to which you want CloudFront to route requests when a request matches the value of the PathPattern property. | `string` | n/a | yes |
-| trusted\_signers | he AWS accounts, if any, that you want to allow to create signed URLs for private content. (OPTIONAL) | `list(string)` | `[]` | no |
+| trusted\_signers | The AWS accounts, if any, that you want to allow to create signed URLs for private content. (OPTIONAL) | `list(string)` | `[]` | no |
 | viewer\_protocol\_policy | the protocol that users can use to access the files in the origin specified by TargetOriginId when a request matches the path pattern in PathPattern. One of allow-all, https-only, or redirect-to-https. | `string` | n/a | yes |
 | web\_acl\_id | The AWS WAF web ACL to associate with this distribution. | `string` | `""` | no |
 | whitelisted\_names | If you have specified whitelist to forward, the whitelisted cookies that you want. | `list(string)` | `[]` | no |

@@ -275,7 +275,7 @@ variable "target_origin_id" {
 }
 
 variable "trusted_signers" {
-  description = "he AWS accounts, if any, that you want to allow to create signed URLs for private content. (OPTIONAL)"
+  description = "The AWS accounts, if any, that you want to allow to create signed URLs for private content. (OPTIONAL)"
   type        = list(string)
   default     = []
 }
